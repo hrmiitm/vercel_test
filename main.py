@@ -11,7 +11,6 @@ app = FastAPI(title="eShopCo Latency Monitor", version="1.0.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Allows all origins
-    allow_credentials=True,
     allow_methods=["*"],  # Allows all methods
     allow_headers=["*"],  # Allows all headers
 )
@@ -136,3 +135,4 @@ def analyze_latency(request: TelemetryRequest):
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing request: {str(e)}")
+
