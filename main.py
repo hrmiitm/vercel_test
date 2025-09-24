@@ -1,5 +1,6 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import List, Dict, Any
 import json
@@ -7,12 +8,14 @@ import numpy as np
 
 app = FastAPI(title="eShopCo Latency Monitor", version="1.0.0")
 
-# Enable CORS for all origins
+# More comprehensive CORS configuration for Vercel
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins
-    allow_methods=["*"],  # Allows all methods
-    allow_headers=["*"],  # Allows all headers
+    allow_origins=["*"],  # Allow all origins
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["*"],
+    expose_headers=["*"]
 )
 
 class TelemetryRequest(BaseModel):
@@ -88,6 +91,22 @@ def calculate_metrics(data: List[Dict], threshold_ms: int) -> RegionMetrics:
         breaches=breaches
     )
 
+# Explicit OPTIONS handler for CORS preflight
+@app.options("/analyze")
+@app.options("/{path:path}")
+async def options_handler(request: Request):
+    """Handle CORS preflight requests"""
+    return JSONResponse(
+        content={},
+        status_code=200,
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+            "Access-Control-Allow-Headers": "*",
+            "Access-Control-Allow-Credentials": "true",
+        }
+    )
+
 @app.get("/")
 def read_root():
     """Health check endpoint"""
@@ -135,4 +154,3 @@ def analyze_latency(request: TelemetryRequest):
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing request: {str(e)}")
-
