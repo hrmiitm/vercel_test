@@ -6,12 +6,13 @@ import numpy as np
 
 app = FastAPI()
 
-# Enable CORS for POST requests from any origin
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["POST", "OPTIONS"],
+    allow_origins=["*"],  # Allow all origins
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
+    expose_headers=["*"]
 )
 
 class TelemetryRequest(BaseModel):
@@ -76,3 +77,4 @@ def analyze_latency(request: TelemetryRequest):
         }
     
     return results
+
