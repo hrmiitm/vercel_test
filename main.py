@@ -4,8 +4,6 @@ from pydantic import BaseModel
 from typing import List, Dict, Any
 import json
 import numpy as np
-from pathlib import Path
-import os
 
 app = FastAPI(title="eShopCo Latency Monitor", version="1.0.0")
 
@@ -138,8 +136,3 @@ def analyze_latency(request: TelemetryRequest):
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing request: {str(e)}")
-
-# Export for Vercel
-def handler(request):
-    """Vercel serverless function handler"""
-    return app
