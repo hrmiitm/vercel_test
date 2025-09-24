@@ -87,9 +87,10 @@ def analyze_latency(request: TelemetryRequest):
         region_metrics[region] = {
             "avg_latency": round(np.mean(latencies), 2),
             "p95_latency": round(np.percentile(latencies, 95), 2),
-            "avg_uptime": round(np.mean(uptimes), 3),
+            "avg_uptime": round(np.mean(uptimes)*100, 3),
             "breaches": sum(1 for lat in latencies if lat > request.threshold_ms)
         }
     
     # Return response with "regions" wrapper
     return {"regions": region_metrics}
+
