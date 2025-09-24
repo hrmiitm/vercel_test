@@ -67,13 +67,13 @@ def analyze_latency(request: TelemetryRequest):
     # Load data from JSON file
     telemetry_data = load_telemetry_data()
     
-    results = {}
+    region_metrics = {}
     
     for region in request.regions:
         data = telemetry_data.get(region, [])
         
         if not data:
-            results[region] = {
+            region_metrics[region] = {
                 "avg_latency": 0,
                 "p95_latency": 0,
                 "avg_uptime": 0,
@@ -84,11 +84,12 @@ def analyze_latency(request: TelemetryRequest):
         latencies = [record["latency_ms"] for record in data]
         uptimes = [record["uptime"] for record in data]
         
-        results[region] = {
+        region_metrics[region] = {
             "avg_latency": round(np.mean(latencies), 2),
             "p95_latency": round(np.percentile(latencies, 95), 2),
             "avg_uptime": round(np.mean(uptimes), 3),
             "breaches": sum(1 for lat in latencies if lat > request.threshold_ms)
         }
     
-    return results
+    # Return response with "regions" wrapper
+    return {"regions": region_metrics}
